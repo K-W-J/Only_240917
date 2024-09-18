@@ -1158,11 +1158,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68bb026fafb42b14791938953eaace77, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_NoiseProfile: {fileID: 11400000, guid: 7b8b70624bf7a194297b41cc204dddf3, type: 2}
+  m_NoiseProfile: {fileID: 11400000, guid: 1dd132e24f2a43f49b6ad9d737eba405, type: 2}
   m_PivotOffset: {x: 0, y: 0, z: 0}
   m_AmplitudeGain: 1
   m_FrequencyGain: 1
-  mNoiseOffsets: {x: 0, y: 0, z: 0}
+  mNoiseOffsets: {x: 734.1029, y: -237.4028, z: 651.68475}
 --- !u!1 &1337876393
 GameObject:
   m_ObjectHideFlags: 0
@@ -1173,7 +1173,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1337876394}
   m_Layer: 0
-  m_Name: PlayerCamera
+  m_Name: CameraPlayer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1347,7 +1347,7 @@ GameObject:
   - component: {fileID: 1921203372}
   - component: {fileID: 1921203368}
   m_Layer: 0
-  m_Name: Capsule
+  m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1482,8 +1482,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _playerVirtualCamera: {fileID: 2097054605}
+  _idleShake: {fileID: 11400000, guid: 1dd132e24f2a43f49b6ad9d737eba405, type: 2}
   _walkShake: {fileID: 11400000, guid: 7b8b70624bf7a194297b41cc204dddf3, type: 2}
-  _runShake: {fileID: 0}
+  _runShake: {fileID: 11400000, guid: 89bb5f1f8273f6d4b8ed4657f93245c3, type: 2}
   _fallShake: {fileID: 0}
   _moveSpeed: 4
   _maxMoveSpeed: 10

@@ -12,7 +12,7 @@ public class PlayerMovement : MonoBehaviour
     [Space(5f)]
 
     [SerializeField] private CinemachineVirtualCamera _playerVirtualCamera;
-    [SerializeField] private NoiseSettings _walkShake, _runShake, _fallShake;
+    [SerializeField] private NoiseSettings _idleShake, _walkShake, _runShake, _fallShake;
 
     [Space(6f)]
     [Header("PlayerValue")]
@@ -22,7 +22,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float _maxMoveSpeed;
     [SerializeField] private float _jumpPower;
 
-    private CinemachineBasicMultiChannelPerlin _playerVirtualCameraShake;
+    private CinemachineBasicMultiChannelPerlin _camNoise;
     private Camera _playerCamera;
 
     private Rigidbody _rb;
@@ -30,15 +30,18 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 _startPostion;
 
     private float _moveSpeedSafe;
+    private float _smoothShakeSafe;
+    private float _amplitudeGain;
 
     private float moveCamX = 0f;
     private float moveCamY = 0f;
 
     private void Awake()
     {
+        _camNoise = _playerVirtualCamera.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
         _rb = GetComponent<Rigidbody>();
         _playerCamera = Camera.main;
-        _playerVirtualCameraShake = _playerVirtualCamera.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
+
 
         Cursor.lockState = CursorLockMode.Locked;
 
@@ -47,6 +50,7 @@ public class PlayerMovement : MonoBehaviour
     private void Update()
     {
         CameraMovement();
+        CameraShake();
         Movement();
         Jump();
         Run();
@@ -69,7 +73,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void Run()
     {
-        print(_moveSpeedSafe);
+
         if (Input.GetButton("Vertical") || Input.GetButton("Horizontal"))
         {
             if (Input.GetKey(KeyCode.LeftShift))
@@ -110,6 +114,33 @@ public class PlayerMovement : MonoBehaviour
 
     private void CameraShake()
     {
-        _playerVirtualCameraShake.m_NoiseProfile = _walkShake;
+
+        if(Input.GetButton("Vertical") || Input.GetButton("Horizontal"))
+        {
+            _camNoise.m_NoiseProfile = _walkShake;
+            _amplitudeGain = 1;
+
+        }
+        else if(Input.GetButton("Vertical") || Input.GetButton("Horizontal") | Input.GetKey(KeyCode.LeftShift))
+        {
+            _camNoise.m_NoiseProfile = _runShake;
+            _amplitudeGain = 2;
+        }
+        else
+        {
+            _camNoise.m_NoiseProfile = _idleShake;
+            _amplitudeGain = 0.5f;
+        }
+
+        if (Mathf.Abs(_camNoise.m_AmplitudeGain - _amplitudeGain) > 0.01f)
+        {
+
+            _camNoise.m_AmplitudeGain = Mathf.Lerp(_camNoise.m_AmplitudeGain, 0f, Time.deltaTime * 2);
+        }
+        else
+        {
+
+            _camNoise.m_AmplitudeGain = Mathf.Lerp(_camNoise.m_AmplitudeGain, _amplitudeGain, Time.deltaTime * 2);
+        }
     }
 }
