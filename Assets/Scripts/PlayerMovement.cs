@@ -22,6 +22,15 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float _maxMoveSpeed;
     [SerializeField] private float _jumpPower;
 
+    [Space(6f)]
+    [Header("GroundCheck")]
+    [Space(5f)]
+
+    [SerializeField] private Mesh _groundChenkMesh;
+    [SerializeField] private Transform _groundChenk;
+    [SerializeField] private LayerMask _layerMask;
+    [SerializeField] private Vector3 _boxSize;
+
     private CinemachineBasicMultiChannelPerlin _camNoise;
     private Camera _playerCamera;
 
@@ -32,6 +41,8 @@ public class PlayerMovement : MonoBehaviour
     private float _moveSpeedSafe;
     private float _smoothShakeSafe;
     private float _amplitudeGain;
+
+    private bool _isGorund;
 
     private float moveCamX = 0f;
     private float moveCamY = 0f;
@@ -46,14 +57,24 @@ public class PlayerMovement : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
 
         _moveSpeedSafe = _moveSpeed;
+
     }
     private void Update()
     {
         CameraMovement();
-        CameraShake();
+        //CameraShake();
+
         Movement();
-        Jump();
         Run();
+
+        Jump();
+        //isGround();
+        
+    }
+
+    private void FixedUpdate()
+    {
+        isGround();
     }
 
     private void Movement()
@@ -64,6 +85,8 @@ public class PlayerMovement : MonoBehaviour
         Vector3 moveDir = new Vector3(moveX * _moveSpeed, _rb.velocity.y, moveY * _moveSpeed);
 
         moveDir = Vector3.Lerp(_startPostion, moveDir, Time.deltaTime * 10);
+
+        moveDir.y = _rb.velocity.y;
 
         _rb.velocity = transform.TransformDirection(moveDir);
 
@@ -97,9 +120,24 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    private void isGround()
+    {
+        Collider[] _gorund = Physics.OverlapBox(_groundChenk.position, _boxSize, new Quaternion(0, 0, 0, 1), _layerMask);
+        _isGorund = _gorund.Length > 0;
+        print(_gorund.Length);
+    }
+
+    private void OnDrawGizmos()
+    {
+        if (_groundChenk == null) return;
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawMesh(_groundChenkMesh, 0, _groundChenk.position, new Quaternion(0, 0, 0, 1), _boxSize);
+        Gizmos.color = Color.green;
+    }
+
     private void Jump()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space) && _isGorund)
         {
             _rb.AddForce(Vector3.up * _jumpPower, ForceMode.Impulse);
         }
@@ -132,15 +170,5 @@ public class PlayerMovement : MonoBehaviour
             _amplitudeGain = 0.5f;
         }
 
-        if (Mathf.Abs(_camNoise.m_AmplitudeGain - _amplitudeGain) > 0.01f)
-        {
-
-            _camNoise.m_AmplitudeGain = Mathf.Lerp(_camNoise.m_AmplitudeGain, 0f, Time.deltaTime * 2);
-        }
-        else
-        {
-
-            _camNoise.m_AmplitudeGain = Mathf.Lerp(_camNoise.m_AmplitudeGain, _amplitudeGain, Time.deltaTime * 2);
-        }
     }
 }
